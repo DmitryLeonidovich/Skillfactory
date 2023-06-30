@@ -106,7 +106,7 @@ class Queue:
         return d
     
     def show_all(self):
-        for i in (self.tasks):
+        for i in self.tasks:
             print(i, end=" ")
         print()
     
