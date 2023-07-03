@@ -84,6 +84,7 @@ class Queue:
         if self.tail == self.head and not self.empty:
             return False  # очередь заполнена
         self.tasks[self.tail] = data
+        self.empty = False
         self.tail += 1
         if self.tail == self.max_size:
             self.tail = 0
@@ -92,13 +93,15 @@ class Queue:
     def pop(self):
         if self.empty:
             return None
-        d = self.tasks[self.head]
+        d_pop = self.tasks[self.head]
+        self.head += 1
         self.empty = self.head == self.tail
-        if not self.empty:
-            self.head += 1
-            if self.head == self.max_size:
-                self.head = 0
-        return d
+        if self.head == self.max_size:
+            self.head = 0
+        if self.head == self.tail:
+            self.empty = True
+            self.size()
+        return d_pop
     
     def show_all(self):
         for i in self.tasks:
@@ -111,44 +114,58 @@ class Queue:
             return out_list
         head = self.head
         done = True
+        
         while done:
+            # print('H=', head, 'T=', self.tail)
             out_list.append(self.tasks[head])
-            done = not head == self.tail - 1
+            head += 1
             if head == self.max_size:
                 head = 0
-            else:
-                head += 1
+            done = not head == self.tail
         return out_list
     
     def size(self):
-        sz = self.tail - self.head
-        if self.tail < self.head:
-            sz += self.max_size
+        if self.tail == self.head:
+            if self.empty:
+                sz = 0
+            else:
+                sz = self.max_size
+        elif self.tail < self.head:
+            sz = self.max_size + self.tail - self.head
         elif self.tail > self.head:
-            pass
-        elif sz == self.empty:
-            sz = self.max_size
+            sz = self.tail - self.head
         return sz
 
 # Используем класс
-# size = int(input("Определите размер очереди: "))
-q = Queue(2)
-q.push("1-")
-q.push("2-")
+size = int(input("Определите размер очереди: "))
+q = Queue(size)
 while True:
-    q.show_all()
+    # q.show_all()
     print(q.show())
-    cmd = input("Введите команду:")
+    # print('H=', q.head, 'T=', q.tail, "Empty=", q.empty)
+    cmd = (input("Введите команду:").split())
     
-    if cmd == "empty":
+    if cmd[0] == "empty":
         if q.is_empty():
             print("Очередь пустая")
         else:
             print("В очереди есть задачи")
             
-    elif cmd == "size":
-        print("Количество задач в очереди:", q.size(), 'H=', q.head, 'T=', q.tail)
-    elif cmd == "push":
+    elif cmd[0] == "size":
+        print("Количество задач в очереди:", q.size())
+        
+    elif len(cmd) > 1 and cmd[0] == "push":
+        if q.size() != q.max_size:
+            d = cmd[1]
+            # d = input("Введите данные:")
+            if q.push(d):
+                print("Успешно добавлено=", d)
+            else:
+                print('Добавить', d, 'не удалось...')
+        else:
+            print("Очередь переполнена")
+    
+    elif cmd[0] == "push":
         if q.size() != q.max_size:
             d = input("Введите данные:")
             if q.push(d):
@@ -157,27 +174,27 @@ while True:
                 print('Добавить', d, 'не удалось...')
         else:
             print("Очередь переполнена")
-            
-    elif cmd == "pop":
+    
+    elif cmd[0] == "pop":
         d = q.pop()
         if d == None:
             print("Очередь пустая")
         else:
             print('Извлечено=', d)
             
-    elif cmd == "show":
+    elif cmd[0] == "show":
         if q.is_empty():
             print("Очередь пустая")
         else:
             q.show()
             
-    elif cmd == "do":
+    elif cmd[0] == "do":
         if q.is_empty():
             print("Очередь пустая")
         else:
             q.do()
             
-    elif cmd == "exit":
+    elif cmd[0] == "exit":
         for _ in range(q.size()):
             q.do()
             
