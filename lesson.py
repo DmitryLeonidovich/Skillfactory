@@ -74,35 +74,30 @@ class Queue:
         self.tasks = [0 for _ in range(self.max_size)]  # инициализируем список с нулевыми элементами
         self.head = 0  # указатель на начало очереди
         self.tail = 0  # указатель на элемент следующий за концом очереди
+        self.empty = True  # флаг пустой очереди
     
     # !!! Класс далее нужно дополнить методами !!!
     def is_empty(self):
-        return self.tail == self.head
+        return self.tail == self.head and self.empty
     
     def push(self, data):
-        curr_tail = self.tail
-        next_tail = self.tail + 1
-        if next_tail == self.max_size:
-            next_tail = 0
-            
-        fl = self.tail == self.head
-            
+        if self.tail == self.head and not self.empty:
+            return False  # очередь заполнена
         self.tasks[self.tail] = data
-        self.tail = next_tail
-        
-        if self.tail == self.head:
-            self.tail == curr_tail
-        
+        self.tail += 1
+        if self.tail == self.max_size:
+            self.tail = 0
         return True
     
     def pop(self):
-        if self.tail == self.head:
+        if self.empty:
             return None
-        next_head = self.head + 1
-        if next_head == self.max_size:
-            next_head = 0
         d = self.tasks[self.head]
-        self.head = next_head
+        self.empty = self.head == self.tail
+        if not self.empty:
+            self.head += 1
+            if self.head == self.max_size:
+                self.head = 0
         return d
     
     def show_all(self):
@@ -131,21 +126,26 @@ class Queue:
             sz += self.max_size
         elif self.tail > self.head:
             pass
+        elif sz == self.empty:
+            sz = self.max_size
         return sz
 
 # Используем класс
-size = int(input("Определите размер очереди: "))
-q = Queue(size)
-
+# size = int(input("Определите размер очереди: "))
+q = Queue(2)
+q.push("1-")
+q.push("2-")
 while True:
     q.show_all()
     print(q.show())
     cmd = input("Введите команду:")
+    
     if cmd == "empty":
         if q.is_empty():
             print("Очередь пустая")
         else:
             print("В очереди есть задачи")
+            
     elif cmd == "size":
         print("Количество задач в очереди:", q.size(), 'H=', q.head, 'T=', q.tail)
     elif cmd == "push":
@@ -159,24 +159,28 @@ while True:
             print("Очередь переполнена")
             
     elif cmd == "pop":
-        if q.tail != q.head:
-            print('Извлечено=', q.pop())
-        else:
+        d = q.pop()
+        if d == None:
             print("Очередь пустая")
+        else:
+            print('Извлечено=', d)
             
     elif cmd == "show":
         if q.is_empty():
             print("Очередь пустая")
         else:
             q.show()
+            
     elif cmd == "do":
         if q.is_empty():
             print("Очередь пустая")
         else:
             q.do()
+            
     elif cmd == "exit":
         for _ in range(q.size()):
             q.do()
+            
         print("Очередь пустая. Завершение работы")
         break
     else:
