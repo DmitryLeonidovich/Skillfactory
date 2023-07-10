@@ -1,59 +1,121 @@
-G = {
-    "Адмиралтейская": {
-        "Садовая": 4},
-    "Садовая": {
-        "Сенная площадь": 4,
-        "Спасская": 3,
-        "Адмиралтейская": 4,
-        "Звенигородская": 5},
-    "Сенная площадь": {
-        "Садовая": 4,
-        "Спасская": 4},
-    "Спасская": {
-        "Садовая": 3,
-        "Сенная площадь": 4,
-        "Достоевская": 6},
-    "Звенигородская": {
-        "Пушкинская": 3,
-        "Садовая": 5},
-    "Пушкинская": {
-        "Звенигородская": 3,
-        "Владимирская": 4},
-    "Владимирская": {
-        "Достоевская": 3,
-        "Пушкинская": 4},
-    "Достоевская": {
-        "Владимирская": 3,
-        "Спасская": 6}
-}
+import random  # модуль, с помощью которого перемешиваем массив
 
-P = {k: None for k in G.keys()}  # вершины-предки с минимальным расстоянием
+# пусть имеем массив всего лишь из 9 элементов
+array = [2, 3, 1, 4, 6, 5, 9, 8, 7]
 
-D = {k: 100 for k in G.keys()}  # расстояния
+is_sort = False  # станет True, если отсортирован
+count = 0  # счётчик количества перестановок
 
-start_k = 'Адмиралтейская'  # стартовая вершина
+while not is_sort:  # пока не отсортирован
+    count += 1  # прибавляем 1 к счётчику
+    
+    random.shuffle(array)  # перемешиваем массив
+    
+    # проверяем отсортирован ли
+    is_sort = True
+    for i in range(len(array) - 1):
+        if array[i] > array[i + 1]:
+            is_sort = False
+            break
 
-D[start_k] = 0  # расстояние от неё до самой себя равно нулю
-
-U = {k: False for k in G.keys()}  # флаги просмотра вершин
-
-for _ in range(len(D)):
-    # выбираем среди непросмотренных наименьшее по расстоянию
-    min_k = min([k for k in U.keys() if not U[k]], key=lambda x: D[x])
-    print("min_k=", min_k)
-    print('G[min_k].keys()=', G[min_k].keys())
-    for v in G[min_k].keys():  # проходимся по всем смежным вершинам
-        print('v=', v, 'D[' + v + ']=', D[v], 'D[' + min_k + ']=', D[min_k], '+ G[' + min_k + '][' + v + ']=', G[min_k][v], '(',
-              D[min_k] + G[min_k][v], ')')
-        D[v] = min(D[v], D[min_k] + G[min_k][v])  # минимум
-        print('D[' + v + ']=', D[v])
-    U[min_k] = True  # просмотренную вершину помечаем
+print(array)
+# [1, 2, 3, 4, 5, 6, 7, 8, 9]
+print(count)
+# 290698
 
 
-print('Предки min  P=', P)
-print('Расстояния  D=', D)
-print('Просм.верш. U=', U)
+array = [2, 3, 1, 4, 6, 5, 9, 8, 7]
+cnt = 0
+for i in range(len(array)): # проходим по всему массиву
 
-for _ in range(len(D)):
+        idx_min = i # сохраняем индекс предположительно минимального элемента
+        for j in range(i+1, len(array)):
+                cnt += 1
+                if array[j] < array[idx_min]:
+                        idx_min = j
+        if i != idx_min: # если индекс не совпадает с минимальным, меняем
+                array[i], array[idx_min] = array[idx_min], array[i]
+
+print(array, '\n', cnt)
 
 
+array = [2, 3, 1, 4, 6, 5, 9, 8, 7]
+cnt = 0
+print(array, '\n', cnt)
+for i in range(len(array)): # проходим по всему массиву
+
+        idx_max = i # сохраняем индекс предположительно минимального элемента
+        for j in range(i+1, len(array)):
+                cnt += 1
+                if array[j] > array[idx_max]:
+                        idx_max = j
+        if i != idx_max: # если индекс не совпадает с минимальным, меняем
+                array[i], array[idx_max] = array[idx_max], array[i]
+
+print(array, '\n', cnt)
+
+array = [2, 3, 1, 4, 6, 5, 9, 8, 7]
+
+for i in range(len(array)):
+    for j in range(len(array) - i - 1):
+        if array[j] > array[j + 1]:
+            array[j], array[j + 1] = array[j + 1], array[j]
+        print(array, array[i], array[j])
+print('Result=', array)
+
+count = 0
+
+array = [2, 3, 1, 4, 6, 5, 9, 8, 7]
+for i in range(1, len(array)):
+    x = array[i]
+    idx = i
+    while idx > 0:
+        count += 1
+        if array[idx - 1] <= x:
+            break
+        array[idx] = array[idx - 1]
+        idx -= 1
+    array[idx] = x
+
+print(count)
+
+
+array = [2, 3, 1, 4, 6, 5, 9, 8, 7]
+
+def merge_sort(L):  # «разделяй»
+    if len(L) < 2:  # если кусок массива равен 2,
+        return L[:]  # выходим из рекурсии
+    else:
+        middle = len(L) // 2  # ищем середину
+        left = merge_sort(L[:middle])  # рекурсивно делим левую часть
+        right = merge_sort(L[middle:])  # и правую
+        return merge(left, right)  # выполняем слияние
+
+
+def merge(left, right):  # «властвуй»
+    result = []  # результирующий массив
+    i, j = 0, 0  # указатели на элементы
+    
+    # пока указатели не вышли за границы
+    while i < len(left) and j < len(right):
+        if left[i] < right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    
+    # добавляем хвосты
+    while i < len(left):
+        result.append(left[i])
+        i += 1
+    
+    while j < len(right):
+        result.append(right[j])
+        j += 1
+    
+    return result
+
+
+print('\nArray =', array)
+print('Result=', merge_sort(array))
